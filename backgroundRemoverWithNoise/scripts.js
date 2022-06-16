@@ -1,20 +1,19 @@
-const myImage = new Image();
-myImage.src = "/ha.png";
+const image = new Image();
 
-const [canvas, ctx] = start(
-  document.querySelector("canvas"),
-  myImage.width,
-  myImage.height,
-  {
-    antialias: false,
-  }
-);
-
-const scale = 80;
-const frequency = 10;
+const scale = 50;
+const frequency = 3;
 
 function draw() {
-  ctx.drawImage(myImage, 0, 0, canvas.width, canvas.height);
+  const [canvas, ctx] = start(
+    document.querySelector("canvas"),
+    image.width,
+    image.height,
+    {
+      antialias: false,
+    }
+  );
+
+  ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
   const pixelData = getImageData(ctx, canvas);
   clear(ctx, canvas);
   imageDataLoop(pixelData, (pixel, x, y) => {
@@ -22,10 +21,24 @@ function draw() {
       brightnessCalc(pixel.r, pixel.g, pixel.b) <
       noise.simplex2((x / scale) * frequency, (y / scale) * frequency)
     ) {
-      // rect(ctx, x, y, 1, 1, objColorToString(pixel), "FILL");
-      rect(ctx, x, y, 1, 1, "white", "FILL");
+      rect(ctx, x, y, 1, 1, objColorToString(pixel), "FILL");
+      // rect(ctx, x, y, 1, 1, "black", "FILL");
     }
   });
+  if (confirm("Download?")) {
+    save(canvas, `${image.src.replace(/^.*[\\\/]/, "")}`);
+  }
 }
 
-window.onload = draw;
+const file = document.getElementById("file");
+file.addEventListener("input", function () {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => {
+    image.src = reader.result;
+    image.onload = (e) => {
+      file.remove();
+      draw();
+    };
+  });
+  reader.readAsDataURL(this.files[0]);
+});

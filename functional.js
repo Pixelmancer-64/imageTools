@@ -1,15 +1,22 @@
-function rect(ctx, x, y, width, height, color = "white", mode = "fill") {
+function rect(ctx, x, y, width, height, color = "black", mode = "fill") {
   ctx.beginPath();
   ctx.rect(x, y, width, height);
-  mode === "stroke" ? (ctx.strokeStyle = color) : (ctx.fillStyle = color);
-  mode === "stroke" ? ctx.stroke() : ctx.fill();
+  ctx.fillStyle = color;
+  ctx.fill();
 }
 
-function arc(ctx, x, y, radius, start, end, color = "white", mode = "fill") {
+function arc(ctx, x, y, radius, start, end, color = "black", mode = "fill") {
   ctx.beginPath();
   ctx.arc(x, y, radius, start, end);
-  mode === "stroke" ? (ctx.strokeStyle = color) : (ctx.fillStyle = color);
-  mode === "stroke" ? ctx.stroke() : ctx.fill();
+  ctx.fillStyle = color;
+  ctx.fill();
+}
+
+function point(ctx, x, y, radius, color = "black", mode = "fill") {
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
 }
 
 function clear(ctx, canvas) {
@@ -106,5 +113,29 @@ function brightnessCalc(red, green, blue) {
   return (
     Math.sqrt(red * red * 0.299 + green * green * 0.587 + blue * blue * 0.114) /
     100
+  );
+}
+
+function save(canvas, link) {
+  const a = document.createElement("a");
+  document.body.appendChild(a);
+  a.download = link;
+  a.href = canvas.toDataURL("image/png");
+  a.click();
+  document.body.removeChild(a);
+}
+
+function loop2D(canvas, cellSize = 1, callback) {
+  for (let y = 0; y < canvas.height; y += cellSize) {
+    for (let x = 0; x < canvas.width; x += cellSize) {
+      callback(x, y);
+    }
+  }
+}
+
+function brightnessCalc(red, green, blue) {
+  return (
+    (red * red * 0.299 + green * green * 0.587 + blue * blue * 0.114) /
+    (100 * 100)
   );
 }
